@@ -3,9 +3,10 @@
  */
 package hurricane.server;
 
+import hurricane.server.embedded.HurricaneHandler;
+
 import java.util.Set;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
@@ -20,6 +21,7 @@ import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 public class HurricaneServerSocket {
 	
 	protected String nickname;
+	private String sendTo;
 	protected Session session;
 	private Set<HurricaneServerSocket> sockets;
 	
@@ -28,6 +30,7 @@ public class HurricaneServerSocket {
 	}
 	
 	/**Basic constructor. Called from {@link HurricaneServlet} or {@link HurricaneServlet#init()}.<br>
+	 * Alternately, this may be called from {@link HurricaneHandler} in the embedded server.<br>
 	 * Name the socket with the given nickname, and direct to the Set of {@link HurricaneServerSocket}.
 	 * @param nickname
 	 * @param sockets
@@ -47,7 +50,10 @@ public class HurricaneServerSocket {
 		this.sockets.add(this);
 	}
 	
-	/**Handler of OnMessage event.
+	/**Handler of OnMessage event.<br>
+	 * There are "special" Hurricane Text Messages and normal Hurricane Text Messages.<br>
+	 * Currently, the only special one is "u" method, which handles determination of a target user.<br>
+	 * The others are actual messages being transferred. They should be simply passed to the target.
 	 * @param message
 	 */
 	@OnWebSocketMessage
@@ -67,7 +73,7 @@ public class HurricaneServerSocket {
 		boolean isDone = false;
 		Future<Void> fut = this.session.getRemote().sendStringByFuture(message);
 		try {
-			fut.get(500, TimeUnit.MILLISECONDS);
+			//fut.get(500, TimeUnit.MILLISECONDS);
 			if (fut.isDone()) {
 				isDone = true;
 			}
