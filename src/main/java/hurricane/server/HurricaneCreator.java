@@ -19,7 +19,7 @@ public class HurricaneCreator extends WebSocketServerFactory {
 
 	public HurricaneCreator(Set<HurricaneServerSocket> sockets) {
 		this.sockets = sockets;
-		System.out.println("Running HurricaneCreator...");
+//		System.out.println("Running HurricaneCreator...");
 	}
 
 	/* (非 Javadoc)

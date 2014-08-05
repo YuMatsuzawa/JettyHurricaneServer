@@ -27,7 +27,7 @@ public class HurricaneHandler extends WebSocketHandler {
 	 */
 	public HurricaneHandler() {
 		this.sockets = new CopyOnWriteArraySet<HurricaneServerSocket>();
-		this.hurry = new HurricaneServerSocket("Hurry", sockets);
+		this.hurry = new HurricaneServerSocket("hurry", sockets);
 	}
 
 	/* (非 Javadoc)
@@ -35,7 +35,7 @@ public class HurricaneHandler extends WebSocketHandler {
 	 */
 	@Override
 	public void configure(WebSocketServletFactory factory) {
-		factory.getPolicy().setIdleTimeout(10000);
+		factory.getPolicy().setIdleTimeout(600000);
 //		factory.register(HurricaneServerSocket.class);
 		factory.setCreator(new HurricaneCreator(this.sockets));
 	}
