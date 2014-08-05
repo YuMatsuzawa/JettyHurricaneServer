@@ -27,5 +27,6 @@
 			<attribute name="owner.project.facets" value="java"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry combineaccessrules="false" kind="src" path="/HurricaneClient"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

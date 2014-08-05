@@ -6,8 +6,8 @@ package hurricane.server;
 import hurricane.message.HurricaneMessage;
 import hurricane.server.embedded.HurricaneHandler;
 
+import java.io.IOException;
 import java.util.Set;
-import java.util.concurrent.Future;
 
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.StatusCode;
@@ -26,7 +26,7 @@ public class HurricaneServerSocket {
 	protected String nickname;
 	private String sendTo;
 	private HurricaneServerSocket sendToSocket = null;
-	protected Session session;
+	protected Session session = null;
 	private Set<HurricaneServerSocket> sockets;
 	
 //	private double RANDOM_REPLY_WINDOW = 3.0;
@@ -108,7 +108,12 @@ public class HurricaneServerSocket {
 	 */
 	@OnWebSocketMessage
 	public void onMessage(String message) {
-		this.assortTextMessageFromRemote(message);
+		try {
+			this.session.getRemote().sendString(HurricaneMessage.SOCK_ACK);
+			this.assortTextMessageFromRemote(message);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**Assort Hurricane Text Message into specials ("u") and normals. Process accordingly.<br>
@@ -122,8 +127,12 @@ public class HurricaneServerSocket {
 			this.setSendTo(splitText);
 		} else {
 			if (this.sendToSocket != null) {
-				this.sendToSocket.sendMessageToRemote(text, this);
 				System.out.printf("[%s]>[%s]: %s\n", this.nickname, this.sendTo, text);
+//				if (this.session.isOpen()) {
+//					this.session.getRemote().sendString(text, null);		//debug echoing
+//				}
+				this.sendToSocket.sendMessageToRemote(text, this);
+//				System.out.printf("[%s]>[%s]: %s\n", this.nickname, this.sendTo, text);
 			}
 		}
 	}
@@ -180,16 +189,17 @@ public class HurricaneServerSocket {
 	public boolean sendMessageToRemote(String message, HurricaneServerSocket sourceSocket) {
 		boolean isDone = false;
 		if (this.session != null) {
-			Future<Void> fut = this.session.getRemote().sendStringByFuture(message);
-			try {
-				//fut.get(500, TimeUnit.MILLISECONDS);
-				if (fut.isDone()) {
-					isDone = true;
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-				return isDone;
-			}
+//			Future<Void> fut = this.session.getRemote().sendStringByFuture(message);
+			this.session.getRemote().sendStringByFuture(message);
+//			try {
+//				//fut.get(500, TimeUnit.MILLISECONDS);
+//				if (fut.isDone()) {
+//					isDone = true;
+//				}
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//				return isDone;
+//			}
 		} else if (this.equals("hurry")) {
 			// dummy user function
 			// immitate "replying behavior".
@@ -210,7 +220,12 @@ public class HurricaneServerSocket {
 //			} catch (InterruptedException e) {
 //				e.printStackTrace();
 //			}
-			isDone = sourceSocket.sendMessageToRemote(text, this);
+			double roll = Math.random();
+			
+			if (roll > 0.5) { // randomly replies
+				System.out.printf("[%s]>[%s]: %s\n", this.nickname, sourceSocket.nickname, text);
+				isDone = sourceSocket.sendMessageToRemote(text, this);
+			}
 		}
 		return isDone;
 	}
