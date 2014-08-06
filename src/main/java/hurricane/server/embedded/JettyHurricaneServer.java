@@ -17,7 +17,7 @@ public class JettyHurricaneServer {
 	 */
 	public static void main(String[] args) throws Exception {
 		
-		Server hurricaneServer = new Server(8080);
+		Server hurricaneServer = new Server(Integer.parseInt(HurricaneConf.getString("JettyHurricaneServer.ListenPort"))); //$NON-NLS-1$
 		
 		
 		HurricaneHandler hurricaneHandler = new HurricaneHandler();
@@ -30,9 +30,9 @@ public class JettyHurricaneServer {
 //			}
 //		};
 		
-		ContextHandler hurricaneContext = new ContextHandler("/hurricane");
-		hurricaneContext.setDisplayName("JettyHurricaneServer");
-		hurricaneContext.setResourceBase(".");
+		ContextHandler hurricaneContext = new ContextHandler(HurricaneConf.getString("JettyHurricaneServer.ContextPath")); //$NON-NLS-1$
+		hurricaneContext.setDisplayName(HurricaneConf.getString("JettyHurricaneServer.DisplayName")); //$NON-NLS-1$
+		hurricaneContext.setResourceBase("."); //$NON-NLS-1$
 		hurricaneContext.setAllowNullPathInfo(true);									//required to accept both "/context" and "/context/" uri
 		hurricaneContext.setClassLoader(Thread.currentThread().getContextClassLoader());
 		hurricaneContext.setHandler(hurricaneHandler);
