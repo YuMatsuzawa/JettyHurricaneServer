@@ -6,7 +6,6 @@ package hurricane.server;
 import hurricane.message.HurricaneMessage;
 import hurricane.server.embedded.HurricaneHandler;
 
-import java.io.IOException;
 import java.util.Set;
 
 import org.eclipse.jetty.websocket.api.Session;
@@ -109,9 +108,9 @@ public class HurricaneServerSocket {
 	@OnWebSocketMessage
 	public void onMessage(String message) {
 		try {
-			this.session.getRemote().sendString(HurricaneMessage.SOCK_ACK);
+//			this.session.getRemote().sendString(HurricaneMessage.SOCK_ACK);		// ACKing for test purpose
 			this.assortTextMessageFromRemote(message);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
